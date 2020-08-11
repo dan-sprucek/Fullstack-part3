@@ -1,0 +1,11 @@
+{
+  "name": "phonebook-backend",
+  "version": "1.0.0",
+  "description": "Fullstack Course Part 3 Phonebook-backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dan Sprucek",
+  "license": "ISC"
+}
