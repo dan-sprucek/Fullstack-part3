@@ -3,6 +3,7 @@ const app = express()
 const morgan = require("morgan")
 
 app.use(express.json())
+app.use(express.static("build"))
 morgan.token('my-token', function (req, res) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :my-token'))
 
@@ -47,32 +48,32 @@ app.get('/info', (req, res) => {
         )
     })
     
-    app.get('/api/persons/:id', (req, res) => {
-        const id = Number(req.params.id)
-        const person = persons.find(person => person.id === id)
-        
-        if (person) {
-            res.json(person) 
-        } else {
-            res.status(404).end()
-        }
-    })
+app.get('/api/persons/:id', (req, res) => {
+    const id = Number(req.params.id)
+    const person = persons.find(person => person.id === id)
     
-    app.delete('/api/persons/:id', (req, res) => {
-        const id = Number(req.params.id)
-        persons = persons.filter(person => person.id !== id)
-        
-        res.status(204).end()
-    })
-    
-    const generateId = () => {
-        const randomId = Math.floor(Math.random() * (200000 - 1) + 1)
-        return randomId
+    if (person) {
+        res.json(person) 
+    } else {
+        res.status(404).end()
     }
+})
+
+app.delete('/api/persons/:id', (req, res) => {
+    const id = Number(req.params.id)
+    persons = persons.filter(person => person.id !== id)
     
-    app.post('/api/persons', (req, res) => {
-        const body = req.body
-        
+    res.status(204).end()
+})
+
+const generateId = () => {
+    const randomId = Math.floor(Math.random() * (200000 - 1) + 1)
+    return randomId
+}
+    
+app.post('/api/persons', (req, res) => {
+    const body = req.body
+    
     if (!body) {
         return res.status(400).json({
             error: "content missing"
