@@ -1,4 +1,4 @@
-require("dotenv").config()
+require('dotenv').config()
 const Person = require("./models/person")
 const express = require("express")
 const app = express()
