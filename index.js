@@ -25,10 +25,6 @@ app.use(express.static("build"))
 
 morgan.token('my-token', function (req, res) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :my-token'))
-
-app.get('/', (req, res) => {
-    res.send(`<h1>Hello</h1>`)
-})
     
 app.get('/api/persons', (req, res) => {
     Person.find({}).then(persons => {
@@ -38,25 +34,30 @@ app.get('/api/persons', (req, res) => {
 
 app.get('/info', (req, res) => {
     const dateStamp = new Date()
-    res.send(
-        `<p>Phonebook has ${Person.length} people</p>
-        <p>${dateStamp}</p>`
-        )
+    Person.find({}).then(person => {
+        res.send(
+            `<p>Phonebook has ${person.length} people</p>
+            <p>${dateStamp}</p>`
+            )
+        })
     })
     
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id).then(person => {
-        res.json(person)
+        if (person) {
+            res.json(person)
+        } else {
+            res.status(404).end()
+        }
     })
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
     Person.findByIdAndRemove(req.params.id).then(result => {
         res.status(204).end()
     })
-    .catch(error => {
-        next(error)
-    })
+    .catch(error => next(error))
 })
     
 app.post('/api/persons', (req, res) => {
@@ -84,6 +85,21 @@ app.post('/api/persons', (req, res) => {
     person.save().then(savedPerson => {
         res.json(savedPerson)
     })
+})
+
+app.put('/api/persons/:id', (req, res, next) => {
+    const body = req.body
+
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(req.params.id, person, { new: true })
+        .then(updatedPerson => {
+            res.json(updatedPerson)
+        })
+        .catch(error => next(error))
 })
 
 app.use(unknownEndpoint)
