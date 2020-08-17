@@ -2,8 +2,6 @@ const express = require('express')
 const app = express()
 require('dotenv').config()
 const Person = require('./models/person')
-const morgan = require('morgan')
-
 
 const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: 'unknown endpoint' })
@@ -24,9 +22,6 @@ const errorHandler = (error, req, res, next) => {
 
 app.use(express.json())
 app.use(express.static('build'))
-
-morgan.token('my-token', function (req, res) { return JSON.stringify(req.body) })
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :my-token'))
 
 app.get('/api/persons', (req, res) => {
   Person.find({}).then(persons => {
@@ -56,7 +51,7 @@ app.get('/api/persons/:id', (req, res, next) => {
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
-  Person.findByIdAndRemove(req.params.id).then(result => {
+  Person.findByIdAndRemove(req.params.id).then(() => {
     res.status(204).end()
   })
     .catch(error => next(error))
